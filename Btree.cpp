@@ -7,8 +7,8 @@ using namespace std;
 
 void BTree::insertBT(int key){
   Node* p = root;
-  Node* x;
-  Node* y;
+  Node* x = new Node(mSize);
+  Node* y = new Node(mSize);
   bool overflowCheck = false;
 
   if(p->nokey == 0){
@@ -32,7 +32,7 @@ void BTree::insertBT(int key){
     else{
       parents.push(p);
     }
-  } while(p = p->subtree[i-1]); // 아래로 내려간다. p 가 null일 때까지.
+  } while((p = p->subtree[i-1])!=NULL); // 아래로 내려간다. p 가 null일 때까지.
 
 
   p = parents.top();  // p가 null일 때까지 내려갔으므로 pop을 하여 leaf 노드로 간다.
@@ -49,9 +49,11 @@ void BTree::insertBT(int key){
       finished = true;
 
       if(overflowCheck){
+
         // 적당한 곳위치 => i를 찾아온다면..
-        p->subtree[i-1] = x;
-        p->subtree[i] = y;
+		  int j = p->getIndexSubtree();
+		  p->subtree[j-1] = x;
+		  p->subtree[j] = y;
       }
     }
     else{
@@ -59,7 +61,12 @@ void BTree::insertBT(int key){
       Node* tempNode = new Node(p->nodeSize+1);
 
       tempNode->key = p->key;
-      tempNode->subtree = p->subtree;
+
+	  for (int i = 0; i < p->nodeSize; i++) {	  // 값만 받아온다. tempNode->subtree = p->subtree 라고 하면 subtree를 그대로 가져와서 size가 작다.
+		  tempNode->subtree[i] = p->subtree[i];
+	  }
+
+	  tempNode->nokey = p->nokey;
       tempNode->insertKey(key);
 
       key = tempNode->getCenter();
@@ -75,12 +82,14 @@ void BTree::insertBT(int key){
       p = parents.top();
       parents.pop();
     }
-    else{
+    else if(!finished){
       // tree의 레벨이 하나 증가한다.
       Node* T = new Node(mSize);
       T->key[1] = key;
-      T->subtree[0] = p;
+	  T->nokey = 1;
+      T->subtree[0] = x;
       T->subtree[1] = y;
+	  root = T;
       finished = true;
 
     }

@@ -10,6 +10,7 @@ public:
   int nokey;
   bool overflow = false;
   bool underflow = false;
+  int indexSubtree = 1;
 
   vector<int> key;
   vector<Node*> subtree;
@@ -17,14 +18,15 @@ public:
   Node(int size){
     nodeSize = size;
     nokey = 0;
-    key.reserve(size);
-    subtree.reserve(size);
+    key.resize(size,0);
+    subtree.resize(size,0);
   }
 
   void insertKey(int key);
   Node* firsthalf();
   Node* secondhalf();
   int getCenter();
+  int getIndexSubtree();
 
 };
 
