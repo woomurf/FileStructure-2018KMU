@@ -11,11 +11,16 @@ void BTree::insertBT(int key){
   Node* y;
   bool overflowCheck = false;
 
+  if(p->nokey == 0){
+    p->insertKey(key);
+    return;
+  }
   // p 노드 안에서 키값들을 비교 한 후, 내려간다.
+  int i;
   do {
-    int i = 1;
+    i = 1;
 
-    // key가 node의 key보다 작을 경우를 찾는다. p0이거나, kn과 kn+1 사이에 있는 경우를 찾을 수 있음.
+    // key가 node의 key보다 작을 경우를 찾는다. p0이거나, kn과 kn+1 사이 에 있는 경우를 찾을 수 있음.
     while(i <= p->nokey && key > p->key[i]){
       i += 1;
     }
@@ -25,11 +30,13 @@ void BTree::insertBT(int key){
       return;
     }
     else{
-      stack.push(p);
+      parents.push(p);
     }
   } while(p = p->subtree[i-1]); // 아래로 내려간다. p 가 null일 때까지.
 
-  p = stack.pop();  // p가 null일 때까지 내려갔으므로 pop을 하여 leaf 노드로 간다.
+
+  p = parents.top();  // p가 null일 때까지 내려갔으므로 pop을 하여 leaf 노드로 간다.
+  parents.pop();
 
   bool finished = false;
 
@@ -57,15 +64,16 @@ void BTree::insertBT(int key){
 
       key = tempNode->getCenter();
 
-      x = tempNode->fristhalf(); // 작은 부분
+      x = tempNode->firsthalf(); // 작은 부분
       y = tempNode->secondhalf(); // 큰 부분
 
       overflowCheck = true;
 
     }
 
-    if(!stack.empty()){
-      p = stack.pop();
+    if(!parents.empty()){
+      p = parents.top();
+      parents.pop();
     }
     else{
       // tree의 레벨이 하나 증가한다.
@@ -79,21 +87,25 @@ void BTree::insertBT(int key){
   } while(!finished);
 
 
-
 }
 
-void Node::insertKey(int insert_key){
-  int i = 1;
+void BTree::inorderBT(){
+  inorderBTInner(root);
+}
 
-  // key가 node의 key보다 작을 경우를 찾는다. p0이거나, kn과 kn+1 사이에 있는 경우를 찾을 수 있음.
-  while(i <= nokey && insert_key > key[i]){
-    i += 1;
+void BTree::inorderBTInner(Node* root){
+
+  if(root == NULL){
+    return;
   }
+  else{
 
-  for(; i < nodeSize; i++){
-    subtree[i+1] = subtree[i];
+    for (size_t i = 0; i < root->nokey; i++) {
+      inorderBTInner(root->subtree[i]);
+      if(i != mSize){
+        cout << root->key[i+1] << ' ';
+      }
+      cout << endl;
+    }
   }
-
-
-
 }

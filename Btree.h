@@ -11,25 +11,32 @@ public:
   bool overflow = false;
   bool underflow = false;
 
-  std::vector<int> key;
-  std::vector<Node*> subtree;
+  vector<int> key;
+  vector<Node*> subtree;
 
   Node(int size){
     nodeSize = size;
     nokey = 0;
-    key.push_back(0); // BT insert 알고리즘을 위해 key vector의 첫 부분을 쓰지않고 index number를 1 부터 사용한다.
+    key.reserve(size);
+    subtree.reserve(size);
   }
 
   void insertKey(int key);
   Node* firsthalf();
   Node* secondhalf();
+  int getCenter();
 
 };
+
+
+
 
 class BTree{
   Node* root;
   stack<Node*> parents;
   int mSize = 0;
+
+  void inorderBTInner(Node* root);
 
 public:
   BTree(int size){
@@ -40,4 +47,4 @@ public:
   void insertBT(int key);
   void deleteBT(int key);
   void inorderBT();
-}
+};
