@@ -8,7 +8,8 @@ using namespace std;
 void BTree::insertBT(int key){
   Node* p = root;
   Node* x = new Node(mSize);
-  Node* y = new Node(mSize);
+  Node* y = NULL;
+  stack<Node*> parents;
   bool overflowCheck = false;
 
   if(p->nokey == 0){
@@ -52,7 +53,6 @@ void BTree::insertBT(int key){
 
         // 적당한 곳위치 => i를 찾아온다면..
 		  int j = p->getIndexSubtree();
-		  p->subtree[j-1] = x;
 		  p->subtree[j] = y;
       }
     }
@@ -70,9 +70,35 @@ void BTree::insertBT(int key){
       tempNode->insertKey(key);
 
       key = tempNode->getCenter();
+	  int j = tempNode->getIndexSubtree();
 
-      x = tempNode->firsthalf(); // 작은 부분
-      y = tempNode->secondhalf(); // 큰 부분
+	  if (overflowCheck) {
+		  Node* y_old = y;
+		  tempNode->subtree[j] = y_old;
+	  }
+
+	  //p를 초기화 하여 tempNode의 절반(작은 부분)을 넣어준다.
+	  //p를 초기화하여 쓰는 이유는 p의 parent Node가 p를 가르키고 있기 때문인데, 새로운 노드를 만들어서 넣으면 parent가 새로운 노드를 가르키게 하는 작업이 성가시다.
+	  p->key.clear();
+	  p->key.resize(p->nodeSize);
+	  p->subtree.clear();
+	  p->subtree.resize(p->nodeSize);
+	  p->nokey = 0;
+
+	  int sub;
+	  for (sub = 1; sub < tempNode->nodeSize / 2; sub++) {
+		  p->key[sub] = tempNode->key[sub];
+		  p->subtree[sub - 1] = tempNode->subtree[sub - 1];
+		  p->nokey++;
+	  } 
+	  p->subtree[sub-1] = tempNode->subtree[sub-1];
+
+	  
+		y = new Node(mSize);
+		y = tempNode->secondhalf(); // 큰 부분
+	  
+ 
+
 
       overflowCheck = true;
 
@@ -87,7 +113,7 @@ void BTree::insertBT(int key){
       Node* T = new Node(mSize);
       T->key[1] = key;
 	  T->nokey = 1;
-      T->subtree[0] = x;
+      T->subtree[0] = p;
       T->subtree[1] = y;
 	  root = T;
       finished = true;
@@ -100,6 +126,7 @@ void BTree::insertBT(int key){
 
 void BTree::inorderBT(){
   inorderBTInner(root);
+  cout << endl;
 }
 
 void BTree::inorderBTInner(Node* root){
@@ -108,13 +135,15 @@ void BTree::inorderBTInner(Node* root){
     return;
   }
   else{
-
-    for (size_t i = 0; i < root->nokey; i++) {
+	  int i;
+    for ( i = 0; i < root->nokey; i++) {
       inorderBTInner(root->subtree[i]);
       if(i != mSize){
         cout << root->key[i+1] << ' ';
       }
-      cout << endl;
     }
+	if (i < mSize) {
+		inorderBTInner(root->subtree[i]);
+	}
   }
 }

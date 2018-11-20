@@ -35,7 +35,6 @@ public:
 
 class BTree{
   Node* root;
-  stack<Node*> parents;
   int mSize = 0;
 
   void inorderBTInner(Node* root);

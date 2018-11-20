@@ -31,11 +31,13 @@ void Node::insertKey(int insert_key){
 Node* Node::firsthalf(){
   Node* p = new Node(nodeSize-1);  // tempNode이므로 기존 노드들 보다 크기가 1 크기 때문에 -1을 해준다.
 
-  for (size_t i = 1; i < nodeSize/2; i++) {
+  int i = 1;
+  for (i = 1; i < nodeSize/2; i++) {
     p->key[i] = key[i];
-    p->subtree[i] = subtree[i];
+    p->subtree[i-1] = subtree[i-1];
 	p->nokey++;
   }
+  p->subtree[i - 1] = subtree[i - 1];
 
   return p;
 
@@ -44,17 +46,18 @@ Node* Node::firsthalf(){
 Node* Node::secondhalf(){
   Node* p = new Node(nodeSize-1);
 
-  vector<int>::iterator keyIt = p->key.begin();
-  vector<Node*>::iterator stIt = p->subtree.begin();
-
-  keyIt++;
 
   // nodeSize/2 의 index를 가진 녀석은 center값이라 위로 올라갈 예정
-  for (size_t i = nodeSize/2+1; i < nodeSize; i++) {
-	p->key.insert(keyIt, key[i]);
-    p->subtree.insert(stIt,subtree[i]);
+  int j = 1;
+  int i = 0;
+  for (i = nodeSize/2+1; i < nodeSize; i++) {
+	p->key[j] = key[i];
+    p->subtree[j-1] = subtree[i-1];
 	p->nokey++;
+	j++;
+
   }
+  p->subtree[j - 1] = subtree[i - 1];
 
   return p;
 }
