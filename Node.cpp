@@ -71,3 +71,25 @@ int Node::getIndexSubtree() {
 	indexSubtree = 1;
 	return i;
 }
+
+void Node::deleteKey(int delete_key) {
+
+	int i = 1;
+	while (i <= nokey && delete_key > key[i] ) {    
+		i++;
+	}
+
+	vector<int>::iterator it = key.begin();
+	for (size_t j = 0; j < i; j++)
+	{
+		it++;
+	}
+
+	if (delete_key == key[i]) {
+		key.erase(it);   // 해당 원소 삭제
+	}
+	nokey--;
+
+	// 이 함수는 단말 노드에서만 사용되므로 포인터를 옮길 걱정이 없다.
+
+}

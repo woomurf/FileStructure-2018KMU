@@ -5,11 +5,8 @@ using namespace std;
 class Node{
 
 public:
-  bool fullflag = false;
   int nodeSize;
   int nokey;
-  bool overflow = false;
-  bool underflow = false;
   int indexSubtree = 1;
 
   vector<int> key;
@@ -23,6 +20,7 @@ public:
   }
 
   void insertKey(int key);
+  void deleteKey(int key);
   Node* firsthalf();
   Node* secondhalf();
   int getCenter();
@@ -48,4 +46,6 @@ public:
   void insertBT(int key);
   void deleteBT(int key);
   void inorderBT();
+  bool left = true;   // bsNode가 x노드의 왼쪽에 있는 노드인지, 오른쪽에 있는 노드인지 기록할 변수
+  Node* getBsNode(Node* x, Node* parent);
 };
