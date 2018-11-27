@@ -79,7 +79,7 @@ void BTree::insertBT(int key){
 	  }
 
 	  //p를 초기화 하여 tempNode의 절반(작은 부분)을 넣어준다.
-	  //p를 초기화하여 쓰는 이유는 p의 parent Node가 p를 가르키고 있기 때문인데, 
+	  //p를 초기화하여 쓰는 이유는 p의 parent Node가 p를 가르키고 있기 때문인데,
 	  //새로운 노드를 만들어서 넣으면 parent가 새로운 노드를 가르키게 하는 작업이 성가시다.
 	  p->key.clear();
 	  p->key.resize(p->nodeSize);
@@ -92,14 +92,14 @@ void BTree::insertBT(int key){
 		  p->key[sub] = tempNode->key[sub];
 		  p->subtree[sub - 1] = tempNode->subtree[sub - 1];
 		  p->nokey++;
-	  } 
+	  }
 	  p->subtree[sub-1] = tempNode->subtree[sub-1];
 
-	  
+
 		y = new Node(mSize);
 		y = tempNode->secondhalf(); // 큰 부분
-	  
- 
+
+
 
 
       overflowCheck = true;
@@ -149,14 +149,21 @@ void BTree::deleteBT(int key) {
 	if (x == NULL) { return; } // 삭제할 키 발견 못함 트리 내부에 없음.
 
 	if (x->subtree[0] != NULL) { // internal node
+
 		Node* internalNode = x;
 		parent.push(x);
 
 		/************** 무조건 오른쪽 서브트리로 갈것인가? 노드수를 비교하여 왼쪽 서브트리의 가장 큰 값으로 후행키를 적용할 것인가? **************/
-		x = x->subtree[i]; // x노드의 오른쪽 서브트리
-		do {
-			parent.push(x);
-		} while ((x = x->subtree[0]) != NULL);  // 왼쪽 끝으로 내려간다    ----> 오른쪽 서브트리에서 가장 작은 값을 찾는다.
+    int leftKey = x->subtree[i-1]->getKeyNumber();
+    int rightKey = x->subtree[i]->getKeyNumber();
+
+    if(rightKey > leftKey){
+      x = x->subtree[i]; // x노드의 오른쪽 서브트리
+  		do {
+  			parent.push(x);
+  		} while ((x = x->subtree[0]) != NULL);  // 왼쪽 끝으로 내려간다    ----> 오른쪽 서브트리에서 가장 작은 값을 찾는다.
+    }
+
 
 		if (x == NULL) {
 			x = parent.top();
@@ -175,13 +182,17 @@ void BTree::deleteBT(int key) {
 		y = parent.top();
 		parent.pop();
 	}
-	
+
 	do {
 		if (x == y || !(x->nokey < underflowLine)) {
 			finished = true;
+
 		}
 		else {
+
 			bsNode = getBsNode(x, y);
+
+
 			int j = 1;
 			while (j <= y->nokey && x->key[0] > y->key[j]) {
 				j++;
@@ -193,6 +204,7 @@ void BTree::deleteBT(int key) {
 
 			if (bsNode->nokey - 1 >= underflowLine) { // bsNode가 키를 나눠줘도 여유있는 경우 -> 키 재분배
 				Node* tempNode = new Node(ceil(mSize*1.5) + 1);
+        std::cout << "key distribute" << '\n';
 
 				// tempNode에 bsNode, x Node, y 값 복사넣기
 				if (left) {  // bsNode 가 x노드의 왼쪽에 있는 노드라면
@@ -320,6 +332,10 @@ void BTree::deleteBT(int key) {
 			*/
 
 			else {
+        std::cout << "node merge" << '\n';
+        std::cout << "bs nokey " << bsNode->nokey << '\n';
+        std::cout << "x nokey " << x->nokey << '\n';
+
 				if (left) {
 					int i = bsNode->nokey;
 					i++;
@@ -367,6 +383,7 @@ void BTree::deleteBT(int key) {
 				}
 
 				x = y;
+
 
 				if (!parent.empty()) {
 					y = parent.top();
@@ -431,7 +448,7 @@ Node* BTree::getBsNode(Node* x, Node* parent) {
 	i--;
 
 	if (i == 0) {
-
+    std::cout << "1" << '\n';
 		//check parent->subtree[1]
 		bsNode = parent->subtree[1];
 		left = false;
@@ -459,11 +476,11 @@ Node* BTree::getBsNode(Node* x, Node* parent) {
 
 	return bsNode;
 
-	
 
 
 
-	
+
+
 
 
 }

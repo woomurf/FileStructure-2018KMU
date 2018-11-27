@@ -7,7 +7,7 @@ using namespace std;
 int main(int argc, char const *argv[]) {
   BTree T(3);
   BTree T2(4);
-  
+
   int list[] = {30,20,62,110,140,15,65,136,150,120,
 	  40,132,19,128,138,100,16,145,70,42,
 	  69,43,26,60,130,50,18,7,36,58,
@@ -20,18 +20,21 @@ int main(int argc, char const *argv[]) {
   };
 
   for (size_t i = 0; i < 40; i++) {
-	  
+
     T.insertBT(list[i]);
-    T.inorderBT();
-	
+
+
   }
 
+  cout << T.root->subtree[1]->subtree[0]->subtree[0]->key[2] << endl;
+
+/*
   for (size_t i = 0; i < 10; i++)
   {
 	  T.deleteBT(delist[i]);
 	  T.inorderBT();
   }
- 
+*/
 
 
   return 0;

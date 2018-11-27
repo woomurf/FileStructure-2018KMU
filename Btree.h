@@ -25,6 +25,7 @@ public:
   Node* secondhalf();
   int getCenter();
   int getIndexSubtree();
+  int getKeyNumber();
 
 };
 
@@ -32,12 +33,13 @@ public:
 
 
 class BTree{
-  Node* root;
   int mSize = 0;
 
   void inorderBTInner(Node* root);
 
 public:
+  Node* root;
+
   BTree(int size){
     root = new Node(size);
     mSize = size;
@@ -46,6 +48,6 @@ public:
   void insertBT(int key);
   void deleteBT(int key);
   void inorderBT();
-  bool left = true;   // bsNode°¡ x³ëµåÀÇ ¿ÞÂÊ¿¡ ÀÖ´Â ³ëµåÀÎÁö, ¿À¸¥ÂÊ¿¡ ÀÖ´Â ³ëµåÀÎÁö ±â·ÏÇÒ º¯¼ö
+  bool left = true;   // bsNodeï¿½ï¿½ xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ê¿ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½Ê¿ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
   Node* getBsNode(Node* x, Node* parent);
 };

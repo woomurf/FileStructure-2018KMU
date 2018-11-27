@@ -75,7 +75,7 @@ int Node::getIndexSubtree() {
 void Node::deleteKey(int delete_key) {
 
 	int i = 1;
-	while (i <= nokey && delete_key > key[i] ) {    
+	while (i <= nokey && delete_key > key[i] ) {
 		i++;
 	}
 
@@ -85,11 +85,35 @@ void Node::deleteKey(int delete_key) {
 		it++;
 	}
 
+
+
 	if (delete_key == key[i]) {
-		key.erase(it);   // 해당 원소 삭제
+		for (; i < nokey-1; i++) {
+      key[i] = key[i+1];
+    }
+    key[i] = 0;
 	}
+
 	nokey--;
 
 	// 이 함수는 단말 노드에서만 사용되므로 포인터를 옮길 걱정이 없다.
+
+}
+
+int Node::getKeyNumber(){
+  int total_key = 0;
+
+  total_key += nokey;
+
+  if(subtree[0] == NULL){
+    return total_key;
+  }
+
+  for (size_t i = 0; i < nokey+1; i++) {
+    total_key += subtree[i]->getKeyNumber();
+  }
+
+  return total_key;
+
 
 }
