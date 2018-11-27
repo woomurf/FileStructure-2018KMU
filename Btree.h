@@ -21,11 +21,11 @@ public:
 
   void insertKey(int key);
   void deleteKey(int key);
-  Node* firsthalf();
   Node* secondhalf();
   int getCenter();
   int getIndexSubtree();
   int getKeyNumber();
+  void deleteIntermediate(int intermediate);
 
 };
 
@@ -48,6 +48,7 @@ public:
   void insertBT(int key);
   void deleteBT(int key);
   void inorderBT();
-  bool left = true;   // bsNode�� x������ ���ʿ� �ִ� ��������, �����ʿ� �ִ� �������� ������ ����
+  bool left = true;   // bsNode가 x 노드의 왼쪽에 있는지 오른쪽에 있는지 판별하는 변수
   Node* getBsNode(Node* x, Node* parent);
+  
 };

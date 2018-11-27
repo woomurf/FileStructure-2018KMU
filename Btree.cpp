@@ -129,8 +129,9 @@ void BTree::insertBT(int key){
 void BTree::deleteBT(int key) {
 	Node* x = root;
 	stack<Node*> parent;
-	Node* y = NULL;
+	Node* y = x;
 	Node* bsNode = NULL;
+	Node* old_x = NULL;
 	int underflowLine = ceil(mSize / 2 + mSize % 2) - 1;
 
 	int i;
@@ -153,7 +154,7 @@ void BTree::deleteBT(int key) {
 		Node* internalNode = x;
 		parent.push(x);
 
-		/************** 무조건 오른쪽 서브트리로 갈것인가? 노드수를 비교하여 왼쪽 서브트리의 가장 큰 값으로 후행키를 적용할 것인가? **************/
+		
     int leftKey = x->subtree[i-1]->getKeyNumber();
     int rightKey = x->subtree[i]->getKeyNumber();
 
@@ -163,6 +164,12 @@ void BTree::deleteBT(int key) {
   			parent.push(x);
   		} while ((x = x->subtree[0]) != NULL);  // 왼쪽 끝으로 내려간다    ----> 오른쪽 서브트리에서 가장 작은 값을 찾는다.
     }
+	else {
+		x = x->subtree[i - 1];
+		do {
+			parent.push(x);
+		} while ((x = x->subtree[x->nokey]) != NULL);
+	}
 
 
 		if (x == NULL) {
@@ -170,8 +177,16 @@ void BTree::deleteBT(int key) {
 			parent.pop();
 
 			int temp = internalNode->key[i];
-			internalNode->key[i] = x->key[1];
-			x->key[i] = temp;  // 후행키와 키값을 교환한다.
+			if (rightKey > leftKey) {
+
+				internalNode->key[i] = x->key[1];
+				x->key[1] = temp;  // 후행키와 키값을 교환한다.
+			}
+			else {
+				internalNode->key[i] = x->key[x->nokey];
+				x->key[x->nokey] = temp;  // 후행키와 키값을 교환한다.
+			}
+			
 		}
 	}
 
@@ -193,10 +208,20 @@ void BTree::deleteBT(int key) {
 			bsNode = getBsNode(x, y);
 
 
-			int j = 1;
-			while (j <= y->nokey && x->key[0] > y->key[j]) {
-				j++;
+			int m = 0;
+			if (left) {
+				while (m <= y->nokey && !(y->subtree[m] == bsNode && y->subtree[m+1] == x)) {
+					m++;
+				}
 			}
+			else {
+				while (m <= y->nokey && !(y->subtree[m] == x && y->subtree[m+1] == bsNode)) {
+					m++;
+				}
+			}
+			m++;
+			int intermediate_y = y->key[m];
+
 
 			/*
 			키 재분배
@@ -204,7 +229,7 @@ void BTree::deleteBT(int key) {
 
 			if (bsNode->nokey - 1 >= underflowLine) { // bsNode가 키를 나눠줘도 여유있는 경우 -> 키 재분배
 				Node* tempNode = new Node(ceil(mSize*1.5) + 1);
-        std::cout << "key distribute" << '\n';
+      
 
 				// tempNode에 bsNode, x Node, y 값 복사넣기
 				if (left) {  // bsNode 가 x노드의 왼쪽에 있는 노드라면
@@ -215,15 +240,15 @@ void BTree::deleteBT(int key) {
 					}
 					tempNode->subtree[i - 1] = bsNode->subtree[i - 1];
 
-					tempNode->key[i] = y->key[j];  // copy key_y
+					tempNode->key[i] = intermediate_y;  // copy key_y
 					i++;
-
-					for (int j = 0; j < x->nokey; j++) {  // copy x node
-						tempNode->key[i] = x->key[i];
-						tempNode->subtree[i - 1] = x->subtree[i - 1];
+					int j;
+					for (j = 0; j < x->nokey; j++) {  // copy x node
+						tempNode->key[i] = x->key[j+1];
+						tempNode->subtree[i - 1] = x->subtree[j];
 						i++;
 					}
-					tempNode->subtree[i - 1] = x->subtree[i - 1];
+					tempNode->subtree[i - 1] = x->subtree[j];
 				}
 				else {
 					int i;
@@ -233,15 +258,16 @@ void BTree::deleteBT(int key) {
 					}
 					tempNode->subtree[i - 1] = x->subtree[i - 1];
 
-					tempNode->key[i] = y->key[j];  // copy key_y
+					tempNode->key[i] = intermediate_y;  // copy key_y
 					i++;
 
-					for (int j = 0; j < bsNode->nokey; j++) { // copy bsNode
-						tempNode->key[i] = bsNode->key[i];
-						tempNode->subtree[i - 1] = bsNode->subtree[i - 1];
+					int j;
+					for (j = 0; j < bsNode->nokey; j++) { // copy bsNode
+						tempNode->key[i] = bsNode->key[j+1];
+						tempNode->subtree[i - 1] = bsNode->subtree[j];
 						i++;
 					}
-					tempNode->subtree[i - 1] = bsNode->subtree[i - 1];
+					tempNode->subtree[i - 1] = bsNode->subtree[j];
 				}
 
 				//tempNode에 있는 값들 재분배하기 -> bsNode에 하나 덜주고 x node에 하나 더준다.
@@ -263,7 +289,7 @@ void BTree::deleteBT(int key) {
 					}
 					bsNode->subtree[i] = tempNode->subtree[i];
 
-					y->key[j] = tempNode->key[i + 1];
+					y->key[m] = tempNode->key[i + 1];
 					i++;
 
 					x->key.clear();
@@ -273,14 +299,15 @@ void BTree::deleteBT(int key) {
 					old_nokey = x->nokey;
 					x->nokey = 0;
 
-					for (size_t j = 0; j < old_nokey + 1; j++)
+					int j;
+					for (j = 0; j < old_nokey + 1; j++)
 					{
-						x->key[i + 1] = tempNode->key[i + 1];
-						x->subtree[i] = tempNode->subtree[i];
+						x->key[j + 1] = tempNode->key[i + 1];
+						x->subtree[j] = tempNode->subtree[i];
 						x->nokey++;
 						i++;
 					}
-					x->subtree[i] = tempNode->subtree[i];
+					x->subtree[j] = tempNode->subtree[i];
 
 				}
 				else {
@@ -301,7 +328,7 @@ void BTree::deleteBT(int key) {
 					}
 					x->subtree[i] = tempNode->subtree[i];
 
-					y->key[j] = tempNode->key[i + 1];
+					y->key[m] = tempNode->key[i + 1];
 					i++;
 
 					bsNode->key.clear();
@@ -311,14 +338,15 @@ void BTree::deleteBT(int key) {
 					old_nokey = bsNode->nokey;
 					bsNode->nokey = 0;
 
+					int j;
 					for (j = 0; j < old_nokey - 1; j++)
 					{
-						bsNode->key[i + 1] = tempNode->key[i + 1];
-						bsNode->subtree[i] = tempNode->subtree[i];
+						bsNode->key[j + 1] = tempNode->key[i + 1];
+						bsNode->subtree[j] = tempNode->subtree[i];
 						bsNode->nokey++;
 						i++;
 					}
-					bsNode->subtree[i] = tempNode->subtree[i];
+					bsNode->subtree[j] = tempNode->subtree[i];
 
 
 				}
@@ -332,15 +360,13 @@ void BTree::deleteBT(int key) {
 			*/
 
 			else {
-        std::cout << "node merge" << '\n';
-        std::cout << "bs nokey " << bsNode->nokey << '\n';
-        std::cout << "x nokey " << x->nokey << '\n';
+        
 
 				if (left) {
 					int i = bsNode->nokey;
 					i++;
 
-					bsNode->key[i] = y->key[j];
+					bsNode->key[i] = intermediate_y;
 					bsNode->nokey++;
 					i++;
 
@@ -354,16 +380,14 @@ void BTree::deleteBT(int key) {
 					}
 					bsNode->subtree[i - 1] = x->subtree[j];
 
-					y->subtree[j] = NULL;
-					y->key[j] = 0;
-					y->nokey--;
+					y->deleteIntermediate(m);
 
 				}
 				else {
 					int i = x->nokey;
 					i++;
 
-					x->key[i] = y->key[j];
+					x->key[i] = intermediate_y;
 					x->nokey++;
 					i++;
 
@@ -377,12 +401,13 @@ void BTree::deleteBT(int key) {
 					}
 					x->subtree[i - 1] = bsNode->subtree[j];
 
-					y->subtree[j] = NULL;
-					y->key[j] = 0;
-					y->nokey--;
+					y->deleteIntermediate(m);
 				}
 
-				x = y;
+				old_x = x;    // x = y를 그냥 해버리면 x,y 둘다 빈 노드가 될 수 있음.
+				x = y;		  // 그 상황이 트리의 레벨이 줄어드는 상황일 때 문제가 발생하여 old_x를 사용한다.
+				
+				
 
 
 				if (!parent.empty()) {
@@ -398,12 +423,17 @@ void BTree::deleteBT(int key) {
 
 	}while (!finished);
 
-	if (y->nokey == 0) {
+	if (y == NULL || y->nokey == 0) {
 		if (left) {
-			root = bsNode;
+			if (bsNode != NULL) {
+				root = bsNode;
+			}
+			else {
+				root = old_x;
+			}
 		}
 		else {
-			root = x;
+			root = old_x;
 		}
 		delete y;
 	}
@@ -441,26 +471,26 @@ Node* BTree::getBsNode(Node* x, Node* parent) {
 	bool keyDis = true;
 
 	// x 노드가 parent노드의 어느 subtree인지 알아낸다.
-	int i = 1;
-	while (i <= parent->nokey && x->key[1] > parent->key[i]) {
-		i++;
+
+	int i = 0;
+	for (i = 0; i < parent->nokey; i++)
+	{
+		if (parent->subtree[i] == x) {
+			break;
+		}
 	}
-	i--;
 
 	if (i == 0) {
-    std::cout << "1" << '\n';
-		//check parent->subtree[1]
+
 		bsNode = parent->subtree[1];
 		left = false;
 	}
-	else if (i == (mSize - 1)) {
-
-		//check parent->subtree[mSize-2]
-		 bsNode = parent->subtree[mSize - 2];
+	else if (i == parent->nokey) {
+		 bsNode = parent->subtree[parent->nokey-1];
 		 left = true;
 	}
 	else {
-		//check parent->subtree[i-1] , parent->subtree[i+1]
+
 		Node* temp1 = parent->subtree[i - 1];
 		Node* temp2 = parent->subtree[i + 1];
 
@@ -475,12 +505,4 @@ Node* BTree::getBsNode(Node* x, Node* parent) {
 	}
 
 	return bsNode;
-
-
-
-
-
-
-
-
 }

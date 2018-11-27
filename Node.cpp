@@ -28,20 +28,6 @@ void Node::insertKey(int insert_key){
   nokey++;
 }
 
-Node* Node::firsthalf(){
-  Node* p = new Node(nodeSize-1);  // tempNode이므로 기존 노드들 보다 크기가 1 크기 때문에 -1을 해준다.
-
-  int i = 1;
-  for (i = 1; i < nodeSize/2; i++) {
-    p->key[i] = key[i];
-    p->subtree[i-1] = subtree[i-1];
-	p->nokey++;
-  }
-  p->subtree[i - 1] = subtree[i - 1];
-
-  return p;
-
-}
 
 Node* Node::secondhalf(){
   Node* p = new Node(nodeSize-1);
@@ -79,19 +65,12 @@ void Node::deleteKey(int delete_key) {
 		i++;
 	}
 
-	vector<int>::iterator it = key.begin();
-	for (size_t j = 0; j < i; j++)
-	{
-		it++;
-	}
-
-
 
 	if (delete_key == key[i]) {
-		for (; i < nokey-1; i++) {
-      key[i] = key[i+1];
-    }
-    key[i] = 0;
+		for (; i < nokey; i++) {
+			key[i] = key[i+1];
+		}
+		key[i] = 0;
 	}
 
 	nokey--;
@@ -116,4 +95,17 @@ int Node::getKeyNumber(){
   return total_key;
 
 
+}
+
+// 노드 합병 시 y 노드의 중간값 삭제를 해주는 함수.
+void Node::deleteIntermediate(int intermediate) {
+	for (size_t i = intermediate; i < nokey; i++)
+	{
+		key[i] = key[i + 1];
+		subtree[i] = subtree[i + 1];
+	}
+
+	subtree[nokey] = NULL;
+	key[nokey] = 0;
+	nokey--;
 }

@@ -22,19 +22,35 @@ int main(int argc, char const *argv[]) {
   for (size_t i = 0; i < 40; i++) {
 
     T.insertBT(list[i]);
+	T.inorderBT();
 
 
   }
 
-  cout << T.root->subtree[1]->subtree[0]->subtree[0]->key[2] << endl;
+  cout << "===================== delete =================" << endl;
 
-/*
-  for (size_t i = 0; i < 10; i++)
+  for (size_t i = 0; i < 40; i++)
   {
 	  T.deleteBT(delist[i]);
 	  T.inorderBT();
   }
-*/
+ 
+  cout << "============================== 4 - way =============================" << endl;
+
+  for (size_t i = 0; i < 40; i++)
+  {
+	  T2.insertBT(list[i]);
+	  T2.inorderBT();
+  }
+
+  cout << "===================== delete =================" << endl;
+
+  for (size_t i = 0; i < 40; i++)
+  {
+	  T2.deleteBT(delist[i]);
+	  T2.inorderBT();
+  }
+
 
 
   return 0;
